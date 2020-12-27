@@ -15,6 +15,7 @@ const UserSchema = new Schema({
   city: { type: String },
   state: { type: String },
   gender: { type: String },
+  isVerified: { type: Boolean },
 });
 
 module.exports = mongoose.model("user", UserSchema);
