@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const path = require("path");
 require("dotenv").config();
 const passport = require("passport");
+const cors = require("cors");
 
 // Setting up MongoDB
 const url =
@@ -32,6 +33,13 @@ app.use(
     secret: "damn 2021",
     resave: false,
     saveUninitialized: false,
+  })
+);
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
   })
 );
 
