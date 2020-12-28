@@ -63,9 +63,10 @@ app.set("view engine", "ejs");
 
 //Route paths go here
 const authRoute = require("./routes/auth.routes");
+const apiRoute = require("./routes/api.routes");
 
 //Route setting
-// app.use("/api", apiRoute);
+app.use("/api", apiRoute);
 app.use("/auth", authRoute);
 app.get("/", (req, res) => {
   res.render("Home");

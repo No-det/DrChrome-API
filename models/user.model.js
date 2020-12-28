@@ -3,8 +3,6 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
   name: { type: String, required: true, max: 100 },
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
   googleID: { type: String, required: true },
   joined: { type: Date, default: Date.now },
   image: { type: String },
