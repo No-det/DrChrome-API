@@ -2,15 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const AppSchema = require("./appointments.model");
 
-const AppoinmentSchema = new Schema({
-  time: { type: Date, default: Date.now, required: true },
-  doctorID: { type: String, required: true },
-  patientID: { type: String, required: true },
-  ans1: { type: String, required: true },
-  ans2: { type: String, required: true }
-});
-
-const UserSchema = new Schema({
+const DocSchema = new Schema({
   name: { type: String, required: true, max: 100 },
   googleID: { type: String, required: true },
   joined: { type: Date, default: Date.now },
@@ -23,8 +15,7 @@ const UserSchema = new Schema({
   state: { type: String },
   gender: { type: String },
   isVerified: { type: Boolean, default: false },
-  isDoctor: { type: Boolean, default: false },
   appointments: [AppSchema],
 });
 
-module.exports = mongoose.model("user", UserSchema);
+module.exports = mongoose.model("doc", DocSchema);

@@ -12,20 +12,20 @@ exports.addUser = async (req, res, next) => {
   res.status(400).send("Pani paali moneee");
 };
 
-exports.addAppoinment = async (req, res) => {
-  let newAppoinment = {
+exports.addAppointment = async (req, res) => {
+  let newAppointment = {
     time: req.body.time,
     doctorID: req.body.doctorID,
     patientID: req.params.id,
-    ans1: req.body.ans1,
-    ans2: req.body.ans2
+    reason: req.body.reason,
+    symptoms: req.body.symptoms
   }
   User.findById({ _id: req.body.doctorID }, (err, doctor) => {
     if (err) {
       console.error("User not Found: ", err);
       res.status(404).send(err);
     } else {
-      doctor.appoinments.push(newAppoinment);
+      doctor.appointments.push(newAppointment);
       doctor.save((err, doctor) => {
         if (err) {
           console.error("Internal Server Error: ", err);
@@ -41,13 +41,13 @@ exports.addAppoinment = async (req, res) => {
       console.error("User not Found: ", err);
       res.status(404).send(err);
     } else {
-      user.appoinments.push(newAppoinment);
+      user.appointments.push(newAppointment);
       user.save((err, user) => {
         if (err) {
           console.error("Internal Server Error: ", err);
           res.status(500).send(err);
         } else {
-          console.log("New Appoinment added to Patient\n", newAppoinment);
+          console.log("New Appoinment added to Patient\n", newAppointment);
           res.status(200).send(user);
         }
       });
