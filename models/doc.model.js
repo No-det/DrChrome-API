@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const AppSchema = require("./appoinments.model");
 
-const UserSchema = new Schema({
+const DocSchema = new Schema({
   name: { type: String, required: true, max: 100 },
   googleID: { type: String, required: true },
   joined: { type: Date, default: Date.now },
@@ -18,4 +18,4 @@ const UserSchema = new Schema({
   appointments: [AppSchema],
 });
 
-module.exports = mongoose.model("user", UserSchema);
+module.exports = mongoose.model("doc", DocSchema);
