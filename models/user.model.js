@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const AppSchema = require("./appoinments.model");
+const AppSchema = require("./appointments.model");
 
 const UserSchema = new Schema({
   name: { type: String, required: true, max: 100 },
@@ -15,6 +15,8 @@ const UserSchema = new Schema({
   state: { type: String },
   gender: { type: String },
   isVerified: { type: Boolean, default: false },
+  isDoctor: { type: Boolean, default: false },
+  firstTime: { type: Boolean, default: true },
   appointments: [AppSchema],
 });
 

@@ -14,10 +14,11 @@ const url =
 const connect = mongoose.connect(url, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  useFindAndModify: false,
 });
 connect.then(
   (db) => {
-    console.log("Connected to the server");
+    console.log("Connected to the DB");
   },
   (err) => {
     console.log(err);

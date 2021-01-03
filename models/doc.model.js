@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const AppSchema = require("./appoinments.model");
+const AppSchema = require("./appointments.model");
 
 const DocSchema = new Schema({
   name: { type: String, required: true, max: 100 },
