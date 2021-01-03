@@ -1,6 +1,16 @@
 const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 
+const changeToken = (doc) => {
+  const token = jwt.sign(
+    {
+      user: updatedUser,
+    },
+    "damn 2021"
+  );
+  return token;
+};
+
 exports.addUser = async (req, res, next) => {
   try {
     const updatedUser = await User.findOneAndUpdate(
@@ -11,12 +21,7 @@ exports.addUser = async (req, res, next) => {
       }
     );
     if (updatedUser) {
-      const token = jwt.sign(
-        {
-          user: updatedUser,
-        },
-        "damn 2021"
-      );
+      const token = changeToken(updatedUser);
       return res.status(200).send({ token: token, user: updatedUser });
     }
   } catch (error) {
