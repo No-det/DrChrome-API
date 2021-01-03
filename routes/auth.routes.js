@@ -21,8 +21,8 @@ router.get("/success", (req, res) => {
     },
     "damn 2021"
   );
-  const auth = "Bearer " + token;
-  res.header("Authoization", auth);
+  // const auth = "Bearer " + token;
+  // res.header("Authoization", auth);
   //   res.status(200).send({ message: "Auth Success", user: req.user });
   res.redirect("http://localhost:3000?token=" + token);
 });
