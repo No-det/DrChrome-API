@@ -2,13 +2,6 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const AppSchema = require("./appointments.model");
 
-const AppoinmentSchema = new Schema({
-  time: { type: Date, default: Date.now, required: true },
-  doctorID: { type: String, required: true },
-  patientID: { type: String, required: true },
-  ans1: { type: String, required: true },
-  ans2: { type: String, required: true }
-});
 
 const UserSchema = new Schema({
   name: { type: String, required: true, max: 100 },

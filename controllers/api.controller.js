@@ -1,15 +1,20 @@
 const User = require("../models/user.model");
 
 exports.addUser = async (req, res, next) => {
-  const updatedUser = await User.findOneAndUpdate(
-    { _id: req.body._id },
-    req.body,
-    {
-      new: true,
-    }
-  );
-  if (updatedUser) return res.status(200).send(updatedUser);
-  res.status(400).send("Pani paali moneee");
+  try {
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: req.body._id },
+      req.body,
+      {
+        new: true,
+      }
+    );
+    if (updatedUser) return res.status(200).send(updatedUser);
+    res.status(400).send("Pani paali moneee");
+  } catch (error) {
+    console.log(error)
+    res.status(500).send("Pani paali moneee");
+  }
 };
 
 exports.addAppointment = async (req, res) => {
@@ -53,4 +58,11 @@ exports.addAppointment = async (req, res) => {
       });
     }
   });
+};
+
+
+exports.getDoctors = async (req, res) => {
+  const doctors = await User.find({isDoctor: true});
+  if (doctors) return res.status(200).send(doctors);
+  return res.send(204).send("No doctors found");
 };

@@ -14,6 +14,7 @@ const url =
 const connect = mongoose.connect(url, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  useFindAndModify: true
 });
 connect.then(
   (db) => {
