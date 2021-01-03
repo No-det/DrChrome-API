@@ -12,7 +12,7 @@ exports.addUser = async (req, res, next) => {
     if (updatedUser) return res.status(200).send(updatedUser);
     res.status(400).send("Pani paali moneee");
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).send("Pani paali moneee");
   }
 };
@@ -23,8 +23,8 @@ exports.addAppointment = async (req, res) => {
     doctorID: req.body.doctorID,
     patientID: req.params.id,
     reason: req.body.reason,
-    symptoms: req.body.symptoms
-  }
+    symptoms: req.body.symptoms,
+  };
   User.findById({ _id: req.body.doctorID }, (err, doctor) => {
     if (err) {
       console.error("User not Found: ", err);
@@ -60,9 +60,27 @@ exports.addAppointment = async (req, res) => {
   });
 };
 
-
 exports.getDoctors = async (req, res) => {
-  const doctors = await User.find({isDoctor: true});
+  const doctors = await User.find({ isDoctor: true });
   if (doctors) return res.status(200).send(doctors);
   return res.send(204).send("No doctors found");
+};
+
+exports.isDoctor = async (req, res) => {
+  try {
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: req.params.id },
+      { isDoctor: req.body.isDoctor, firstTime: false },
+      {
+        new: true,
+      }
+    );
+    console.log("In try");
+    if (updatedUser) return res.status(200).send(updatedUser);
+    res.status(400).send("Pani paali moneee");
+  } catch (error) {
+    console.log("In catch");
+    console.log(error);
+    res.status(500).send("Pani paali moneee");
+  }
 };

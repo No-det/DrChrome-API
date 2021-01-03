@@ -21,10 +21,14 @@ router.get("/success", (req, res) => {
     },
     "damn 2021"
   );
-  const auth = "Bearer " + token;
-  res.header("Authoization", auth);
+  // const auth = "Bearer " + token;
+  // res.header("Authoization", auth);
   //   res.status(200).send({ message: "Auth Success", user: req.user });
-  res.redirect("http://localhost:3000?token=" + token);
+  let url;
+  !req.user.firstTime
+    ? (url = `http://localhost:3000/?token=${token}`)
+    : (url = `http://localhost:3000/isDoctor?token=${token}`);
+  res.redirect(url);
 });
 
 router.get("/error", (req, res) => {
