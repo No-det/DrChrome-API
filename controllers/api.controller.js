@@ -17,6 +17,19 @@ exports.addUser = async (req, res, next) => {
   }
 };
 
+
+exports.getUser = async (req, res) => {
+  User.findById({ _id: req.params.id }, (err, user) => {
+    if (err) {
+      console.error("User not Found: ", err);
+      res.status(404).send(err);
+    } else {
+      res.status(200).send(user);
+    }
+  });
+}
+
+
 exports.addAppointment = async (req, res) => {
   let newAppointment = {
     time: req.body.time,
