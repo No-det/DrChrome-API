@@ -42,10 +42,10 @@ router.get("/user", (req, res, next) => {
   try {
     const decoded = jwt.verify(token, "damn 2021");
     req.userData = decoded;
-    res.status(200).json({ user: req.userData });
+    res.status(200).send({ user: req.userData });
     next();
   } catch (error) {
-    res.status(400).json({ message: "Invalid Token!" });
+    res.status(400).send({ message: "Invalid Token!" });
   }
 });
 
