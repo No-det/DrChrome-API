@@ -27,7 +27,12 @@ connect.then(
 
 // Creating server
 const app = express();
-
+const server = require("http").Server(app);
+const io = require("socket.io")(server);
+const { ExpressPeerServer } = require("peer");
+const peerServer = ExpressPeerServer(server, {
+  debug: true,
+});
 //Sessions
 app.use(
   session({
@@ -56,6 +61,9 @@ app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Peer JS
+app.use("/peerjs", peerServer);
+
 //Setting path to static files
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -65,10 +73,12 @@ app.set("view engine", "ejs");
 //Route paths go here
 const authRoute = require("./routes/auth.routes");
 const apiRoute = require("./routes/api.routes");
+const meetRoute = require("./routes/meet.routes");
 
 //Route setting
 app.use("/api", apiRoute);
 app.use("/auth", authRoute);
+app.use("/meet", meetRoute);
 app.get("/", (req, res) => {
   res.render("Home");
 });
@@ -80,6 +90,16 @@ app.get("/", (req, res) => {
 
 //Connecting to port
 const port = process.env.PORT || 8000;
-app.listen(port, () => {
-  console.log("Listening to port ", port, " at http://localhost:" + port);
+
+io.on("connection", (socket) => {
+  console.log("Client Connected");
+  socket.on("join-room", (roomId) => {
+    socket.join(roomId);
+    socket.to(roomId).broadcast.emit("user-connected");
+  });
+});
+
+// DO NOT CHANGE TO app.listen, This is required for the video conf
+server.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
 });
