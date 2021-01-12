@@ -32,23 +32,26 @@ exports.addUser = async (req, res, next) => {
 
 
 exports.getUser = async (req, res) => {
-  User.findById({ _id: req.params.id }, (err, user) => {
-    if (err) {
-      console.error("User not Found: ", err);
-      res.status(404).send(err);
-    } else {
-      res.status(200).send(user);
-    }
-  });
+  let user = await User.findById({ _id: req.params.id });
+  user.appointments.map(appointment => {
+    if (new Date(appointment.time) < new Date())
+      appointment.status = "done"
+  })
+  user = await user.save();
+  return res.status(200).send(user);
 }
 
 
 exports.addAppointment = async (req, res) => {
   let active = 0;
-  User.findById({ _id: req.params.id }, (err, user) => {
+  User.findById({ _id: req.params.id }, async (err, user) => {
     if (user) {
       user.appointments.map(appointment => {
-        console.log(active)
+        if (new Date(appointment.time) < new Date())
+          appointment.status = "done"
+      })
+      await user.save();
+      user.appointments.map(appointment => {
         if (appointment.status === "pending") active += 1;
       })
       let newAppointment = {
