@@ -35,7 +35,7 @@ exports.getUser = async (req, res) => {
   let user = await User.findById({ _id: req.params.id });
   user.appointments.map(appointment => {
     if (new Date(appointment.time) < new Date())
-      appointment.status = "done"
+      appointment.isDone = true;
   })
   user = await user.save();
   return res.status(200).send(user);
@@ -43,16 +43,16 @@ exports.getUser = async (req, res) => {
 
 
 exports.addAppointment = async (req, res) => {
-  let active = 0;
+  let pending = 0;
   User.findById({ _id: req.params.id }, async (err, user) => {
     if (user) {
       user.appointments.map(appointment => {
         if (new Date(appointment.time) < new Date())
-          appointment.status = "done"
+          appointment.isDone = true;
       })
       await user.save();
       user.appointments.map(appointment => {
-        if (appointment.status === "pending") active += 1;
+        if (!appointment.isDone) pending += 1;
       })
       let newAppointment = {
         time: req.body.time,
@@ -61,7 +61,7 @@ exports.addAppointment = async (req, res) => {
         reason: req.body.reason,
         symptoms: req.body.symptoms,
       };
-      if (active < 4) {
+      if (pending < 4) {
           User.findById({ _id: req.body.doctorID }, (err, doctor) => {
             if (err) {
               console.error("User not Found: ", err);
@@ -122,4 +122,16 @@ exports.isDoctor = async (req, res) => {
     console.log(error);
     res.status(500).send("Pani paali moneee");
   }
+};
+
+
+exports.updateAppointment = async (req, res) => {
+  const user = await User.findById({ _id: req.params.id });
+  user.appointments.map(appointment => {
+    if (appointment._id.equals(req.body._id))
+      appointment = {...appointment, ...req.body}
+  });
+  user = await user.save();
+  const token = changeToken(user);
+  return res.status(200).send({token: token});
 };

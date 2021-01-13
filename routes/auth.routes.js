@@ -9,7 +9,7 @@ router.get(
   "/google/callback",
   passport.authenticate("google", { failureRedirect: "/auth/error" }),
   (req, res) => {
-    console.log("Sucessful");
+    console.log("Login Success");
     res.redirect("/auth/success");
   }
 );
@@ -26,8 +26,12 @@ router.get("/success", (req, res) => {
   //   res.status(200).send({ message: "Auth Success", user: req.user });
   let url;
   !req.user.firstTime
-    ? (url = `http://localhost:3000/?token=${token}`)
+    ? 
+    req.user.isDoctor ?
+      (url = `http://localhost:3000/?token=${token}`)
+      : (url = `http://localhost:3000/?token=${token}`)
     : (url = `http://localhost:3000/isDoctor?token=${token}`);
+  console.log(req.user.name, "logged in")
   res.redirect(url);
 });
 
