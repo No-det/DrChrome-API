@@ -1,13 +1,19 @@
 const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
+const { use } = require("../routes/auth.routes");
+
+
+const sortAppointments = (app1, app2) => {
+  if (new Date(app1.time) < new Date(app2.time))
+    return -1;
+  if (new Date(app1.time) > new Date(app2.time))
+    return 1;
+  return 0;
+};
+
 
 const changeToken = (doc) => {
-  const token = jwt.sign(
-    {
-      user: doc,
-    },
-    "damn 2021"
-  );
+  const token = jwt.sign({ user: doc }, "damn 2021");
   return token;
 };
 
@@ -33,10 +39,17 @@ exports.addUser = async (req, res, next) => {
 
 exports.getUser = async (req, res) => {
   let user = await User.findById({ _id: req.params.id });
+  user.upcomingApps = [];
   user.appointments.map(appointment => {
-    if (new Date(appointment.time) < new Date())
+    if (new Date(appointment.time) < new Date()) {
       appointment.isDone = true;
+    }
+    else {
+      appointment.isDone = false;
+      user.upcomingApps.push(appointment);
+    }
   })
+  user.upcomingApps.sort(sortAppointments);
   user = await user.save();
   return res.status(200).send(user);
 }
@@ -101,11 +114,13 @@ exports.addAppointment = async (req, res) => {
   });
 };
 
+
 exports.getDoctors = async (req, res) => {
   const doctors = await User.find({ isDoctor: true });
   if (doctors) return res.status(200).send(doctors);
   return res.send(204).send("No doctors found");
 };
+
 
 exports.isDoctor = async (req, res) => {
   try {

@@ -32,6 +32,7 @@ const UserSchema = new Schema({
   inMeet : { type: Boolean, default: false },
   firstTime: { type: Boolean, default: true },
   appointments: [AppSchema],
+  upcomingApps: [AppSchema],
 });
 
 module.exports = mongoose.model("user", UserSchema);

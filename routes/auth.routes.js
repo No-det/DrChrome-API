@@ -3,6 +3,16 @@ const passport = require("passport");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 
+
+const sortAppointments = (app1, app2) => {
+  if (new Date(app1.time) < new Date(app2.time))
+    return -1;
+  if (new Date(app1.time) > new Date(app2.time))
+    return 1;
+  return 0;
+};
+
+
 router.get("/google", passport.authenticate("google", { scope: ["profile"] }));
 
 router.get(
@@ -14,10 +24,20 @@ router.get(
   }
 );
 
-router.get("/success", (req, res) => {
+router.get("/success", async (req, res) => {
+  req.user.upcomingApps = [];
+  req.user.appointments.map(appointment => {
+    if (new Date(appointment.time) < new Date())
+      appointment.isDone = true;
+    else {
+      appointment.isDone = false;
+      req.user.upcomingApps.push(appointment);
+    }
+  })
+  req.user.upcomingApps.sort(sortAppointments);
   const token = jwt.sign(
     {
-      user: req.user,
+      user: req.user
     },
     "damn 2021"
   );
