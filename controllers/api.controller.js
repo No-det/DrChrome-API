@@ -39,19 +39,32 @@ exports.addUser = async (req, res, next) => {
 
 exports.getUser = async (req, res) => {
   let user = await User.findById({ _id: req.params.id });
-  user.upcomingApps = [];
+  previousApps = [];
+  pendingApps = [];
+  upcomingApps = [];
   user.appointments.map(appointment => {
     if (new Date(appointment.time) < new Date()) {
       appointment.isDone = true;
+      previousApps.push(appointment);
     }
-    else {
+    else if (appointment.isProcessed && appointment.isAccepted) {
       appointment.isDone = false;
-      user.upcomingApps.push(appointment);
+      upcomingApps.push(appointment);
+    } else if (!appointment.isProcessed) {
+      appointment.isDone = false;
+      pendingApps.push(appointment);
     }
   })
-  user.upcomingApps.sort(sortAppointments);
+  previousApps.sort(sortAppointments);
+  pendingApps.sort(sortAppointments);
+  upcomingApps.sort(sortAppointments);
   user = await user.save();
-  return res.status(200).send(user);
+  return res.status(200).send(
+    {...user, 
+      previousApps: previousApps, 
+      pendingApps: pendingApps, 
+      upcomingApps: upcomingApps
+    });
 }
 
 
@@ -141,12 +154,27 @@ exports.isDoctor = async (req, res) => {
 
 
 exports.updateAppointment = async (req, res) => {
-  const user = await User.findById({ _id: req.params.id });
+  let user = await User.findById({ _id: req.params.id });
   user.appointments.map(appointment => {
-    if (appointment._id.equals(req.body._id))
-      appointment = {...appointment, ...req.body}
+    if (appointment.isProcessed) 
+      if (appointment.isAccepted) console.log("Processed - Accepted")
+      else console.log("Processed - NotAccepted")
+    else console.log("NotProcessed")
+  });
+  user.appointments.map(appointment => {
+    if (appointment._id.equals(req.body._id)) {
+      appointment.isProcessed = req.body.isProcessed;
+      appointment.isAccepted = req.body.isAccepted;
+    }
   });
   user = await user.save();
+  console.log("\nAfter updation \n")
+  user.appointments.map(appointment => {
+    if (appointment.isProcessed) 
+      if (appointment.isAccepted) console.log("Processed - Accepted")
+      else console.log("Processed - NotAccepted")
+    else console.log("NotProcessed")
+  });
   const token = changeToken(user);
   return res.status(200).send({token: token});
 };
