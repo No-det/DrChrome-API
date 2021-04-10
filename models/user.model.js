@@ -32,6 +32,8 @@ const UserSchema = new Schema({
   inMeet: { type: Boolean, default: false },
   firstTime: { type: Boolean, default: true },
   appointments: [AppSchema],
+  previousApps: [AppSchema],
+  pendingApps: [AppSchema],
   upcomingApps: [AppSchema],
 });
 
