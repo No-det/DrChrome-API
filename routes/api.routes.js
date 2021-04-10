@@ -4,7 +4,7 @@ const router = express.Router();
 const apiController = require("../controllers/api.controller");
 
 router.post("/updateUser", apiController.updateUser);
-router.get("/getUser/:id", apiController.getUser);
+router.get("/getUser/:uid", apiController.getUser);
 router.post("/appointment/:id", apiController.addAppointment);
 router.post("/updateApp/:id", apiController.updateAppointment);
 router.post("/isDoctor/:id", apiController.isDoctor);

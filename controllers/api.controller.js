@@ -1,6 +1,5 @@
 const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
-const { use } = require("../routes/auth.routes");
 
 const sortAppointments = (app1, app2) => {
   if (new Date(app1.time) < new Date(app2.time)) return -1;
@@ -33,7 +32,7 @@ exports.updateUser = async (req, res, next) => {
 };
 
 exports.getUser = async (req, res) => {
-  let user = await User.findById({ _id: req.params.id });
+  let user = await User.findOne({ uid: req.params.uid });
   previousApps = [];
   pendingApps = [];
   upcomingApps = [];
@@ -53,14 +52,7 @@ exports.getUser = async (req, res) => {
   pendingApps.sort(sortAppointments);
   upcomingApps.sort(sortAppointments);
   user = await user.save();
-  return res
-    .status(200)
-    .send({
-      ...user,
-      previousApps: previousApps,
-      pendingApps: pendingApps,
-      upcomingApps: upcomingApps,
-    });
+  return res.status(200).send(user);
 };
 
 exports.addAppointment = async (req, res) => {
