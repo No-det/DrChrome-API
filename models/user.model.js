@@ -3,8 +3,8 @@ const Schema = mongoose.Schema;
 const AppSchema = require("./appointments.model");
 
 const UserSchema = new Schema({
+  uid: { type: String, required: true },
   name: { type: String, required: true, max: 100 },
-  googleID: { type: String, required: true },
   joined: { type: Date, default: Date.now },
   image: { type: String },
   dob: { type: Date },
@@ -29,7 +29,7 @@ const UserSchema = new Schema({
   gender: { type: String, default: "NA" },
   isVerified: { type: Boolean, default: false },
   isDoctor: { type: Boolean, default: false },
-  inMeet : { type: Boolean, default: false },
+  inMeet: { type: Boolean, default: false },
   firstTime: { type: Boolean, default: true },
   appointments: [AppSchema],
   upcomingApps: [AppSchema],
