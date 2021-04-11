@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const AppSchema = require("./appointments.model");
 
 const UserSchema = new Schema({
   uid: { type: String, required: true },
@@ -31,10 +30,10 @@ const UserSchema = new Schema({
   isDoctor: { type: Boolean, default: false },
   inMeet: { type: Boolean, default: false },
   firstTime: { type: Boolean, default: true },
-  appointments: [AppSchema],
-  previousApps: [AppSchema],
-  pendingApps: [AppSchema],
-  upcomingApps: [AppSchema],
+  appointments: [{ type: Schema.Types.ObjectId, ref: "Appointment" }],
+  previousApps: [{ type: Schema.Types.ObjectId, ref: "Appointment" }],
+  pendingApps: [{ type: Schema.Types.ObjectId, ref: "Appointment" }],
+  upcomingApps: [{ type: Schema.Types.ObjectId, ref: "Appointment" }]
 });
 
 module.exports = mongoose.model("user", UserSchema);

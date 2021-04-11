@@ -1,5 +1,4 @@
 const User = require("../models/user.model");
-const Appointment = require("../models/appointment.model");
 const jwt = require("jsonwebtoken");
 
 const sortAppointments = (app1, app2) => {
@@ -7,36 +6,6 @@ const sortAppointments = (app1, app2) => {
   if (new Date(app1.time) > new Date(app2.time)) return 1;
   return 0;
 };
-
-const populateUserData = async (uid) => {
-    let user = await User.findOne({ uid: uid }).populate("appointments");
-    user.previousApps = [];
-    user.pendingApps = [];
-    user.upcomingApps = [];
-    user.appointments.map((appointment) => {
-      if (new Date(appointment.time) < new Date()) {
-        appointment.isDone = true;
-        user.previousApps.push(appointment._id);
-      } else if (appointment.isProcessed && appointment.isAccepted) {
-        appointment.isDone = false;
-        user.upcomingApps.push(appointment._id);
-      } else if (!appointment.isProcessed) {
-        appointment.isDone = false;
-        user.pendingApps.push(appointment._id);
-      }
-    });
-    user.depopulate();
-    user = await user.save();
-    user = await user.populate("appointments")
-                    .populate("previousApps")
-                    .populate("pendingApps")
-                    .populate("upcomigApps")
-                    .execPopulate();
-    user.previousApps.sort(sortAppointments);
-    user.pendingApps.sort(sortAppointments);
-    user.upcomingApps.sort(sortAppointments);
-    return user;
-}
 
 const changeToken = (doc) => {
   const token = jwt.sign({ user: doc }, "damn 2021");
@@ -63,7 +32,26 @@ exports.updateUser = async (req, res, next) => {
 };
 
 exports.getUser = async (req, res) => {
-  let user = populateUserData(req.params.uid);
+  let user = await User.findOne({ uid: req.params.uid });
+  previousApps = [];
+  pendingApps = [];
+  upcomingApps = [];
+  user.appointments.map((appointment) => {
+    if (new Date(appointment.time) < new Date()) {
+      appointment.isDone = true;
+      previousApps.push(appointment);
+    } else if (appointment.isProcessed && appointment.isAccepted) {
+      appointment.isDone = false;
+      upcomingApps.push(appointment);
+    } else if (!appointment.isProcessed) {
+      appointment.isDone = false;
+      pendingApps.push(appointment);
+    }
+  });
+  previousApps.sort(sortAppointments);
+  pendingApps.sort(sortAppointments);
+  upcomingApps.sort(sortAppointments);
+  user = await user.save();
   return res.status(200).send(user);
 };
 
@@ -78,33 +66,48 @@ exports.addAppointment = async (req, res) => {
       user.appointments.map((appointment) => {
         if (!appointment.isDone) pending += 1;
       });
+      let newAppointment = {
+        time: req.body.time,
+        doctorID: req.body.doctorID,
+        patientID: req.params.uid,
+        reason: req.body.reason,
+        symptoms: req.body.symptoms,
+      };
       if (pending < 4) {
-        let newAppointment = await Appointment.create({
-          time: req.body.time,
-          doctorID: req.body.doctorID,
-          patientID: req.params.uid,
-          reason: req.body.reason,
-          symptoms: req.body.symptoms,
-        });
-        User.findOne({ uid: req.body.doctorID }, async (err, doctor) => {
+        User.findById({ _id: req.body.doctorID }, (err, doctor) => {
           if (err) {
             console.error("User not Found: ", err);
             res.status(404).send(err);
           } else {
-            doctor.appointments.push(newAppointment._id);
-            doctor = await doctor.save();
+            doctor.appointments.push(newAppointment);
+            doctor.save((err, doctor) => {
+              if (err) {
+                console.error("Internal Server Error: ", err);
+                res.status(500).send(err);
+              } else {
+                console.log("New Appoinment added to Doctor");
+              }
+            });
           }
         });
-        User.findOne({ uid: req.params.uid }, async (err, patient) => {
+        User.findOne({ uid: req.params.uid }, (err, user) => {
           if (err) {
             console.error("User not Found: ", err);
             res.status(404).send(err);
           } else {
-            patient.appointments.push(newAppointment._id);
-            patient = await patient.save();
+            user.appointments.push(newAppointment);
+            user.save((err, user) => {
+              if (err) {
+                console.error("Internal Server Error: ", err);
+                res.status(500).send(err);
+              } else {
+                console.log("New Appoinment added to Patient");
+                user.testmani = ["hhoou", "heei"]
+                res.status(200).send(user);
+              }
+            });
           }
         });
-        res.status(200).send("Appointment added");
       } else res.status(203).send("Max limit reached : 4 Appointments");
     }
   });

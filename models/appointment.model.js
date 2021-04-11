@@ -14,4 +14,4 @@ const AppointmentSchema = new Schema({
   isDone: { type: Boolean, default: false },
 });
 
-module.exports = AppointmentSchema;
+module.exports = mongoose.model("Appointment", AppointmentSchema);
