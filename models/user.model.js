@@ -26,14 +26,12 @@ const UserSchema = new Schema({
     "16:00 - 17:00": { type: Boolean, default: false },
   },
   gender: { type: String, default: "NA" },
+  isNewUser: { type: Boolean, default: true },
   isVerified: { type: Boolean, default: false },
   isDoctor: { type: Boolean, default: false },
   inMeet: { type: Boolean, default: false },
   firstTime: { type: Boolean, default: true },
   appointments: [{ type: Schema.Types.ObjectId, ref: "Appointment" }],
-  previousApps: [{ type: Schema.Types.ObjectId, ref: "Appointment" }],
-  pendingApps: [{ type: Schema.Types.ObjectId, ref: "Appointment" }],
-  upcomingApps: [{ type: Schema.Types.ObjectId, ref: "Appointment" }]
 });
 
 module.exports = mongoose.model("user", UserSchema);

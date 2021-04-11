@@ -9,32 +9,8 @@ const sortAppointments = (app1, app2) => {
 };
 
 const populateUserData = async (uid) => {
-    let user = await User.findOne({ uid: uid }).populate("appointments");
-    user.previousApps = [];
-    user.pendingApps = [];
-    user.upcomingApps = [];
-    user.appointments.map((appointment) => {
-      if (new Date(appointment.time) < new Date()) {
-        appointment.isDone = true;
-        user.previousApps.push(appointment._id);
-      } else if (appointment.isProcessed && appointment.isAccepted) {
-        appointment.isDone = false;
-        user.upcomingApps.push(appointment._id);
-      } else if (!appointment.isProcessed) {
-        appointment.isDone = false;
-        user.pendingApps.push(appointment._id);
-      }
-    });
-    user.depopulate();
+    let user = await User.findOne({ uid: uid });
     user = await user.save();
-    user = await user.populate("appointments")
-                    .populate("previousApps")
-                    .populate("pendingApps")
-                    .populate("upcomigApps")
-                    .execPopulate();
-    user.previousApps.sort(sortAppointments);
-    user.pendingApps.sort(sortAppointments);
-    user.upcomingApps.sort(sortAppointments);
     return user;
 }
 
@@ -63,7 +39,7 @@ exports.updateUser = async (req, res, next) => {
 };
 
 exports.getUser = async (req, res) => {
-  let user = populateUserData(req.params.uid);
+  let user = await User.findOne({ uid: req.params.uid }).populate("appointments");
   return res.status(200).send(user);
 };
 
